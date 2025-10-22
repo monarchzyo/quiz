@@ -1,0 +1,4 @@
+John Smith,20,0,0
+Jane Doe,21,0,0
+Bob Johnson,19,0,0
+Alice Brown,22,0,0
