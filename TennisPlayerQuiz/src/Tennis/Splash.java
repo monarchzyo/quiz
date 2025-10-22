@@ -30,7 +30,7 @@ public class Splash extends JWindow
         title.setFont(new Font("Sans-Serif", Font.BOLD, 28));
         title.setForeground(new Color(0, 100, 0));
         
-        JLabel imageLabel = new JLabel(new ImageIcon(temp)); //REPLACE
+        JLabel imageLabel = new JLabel(new ImageIcon("src/Image/Splash.jpg"));
         
         
         content.setLayout(new BorderLayout());

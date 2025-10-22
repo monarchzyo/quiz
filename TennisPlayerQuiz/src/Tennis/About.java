@@ -25,12 +25,12 @@ public class About extends javax.swing.JDialog
         infoJTextArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Baby Name Popularity Ranking About Form");
+        setTitle("Tennis players quiz about");
         setResizable(false);
 
         titleJLabel.setFont(new java.awt.Font("Tempus Sans ITC", 2, 36)); // NOI18N
         titleJLabel.setForeground(new java.awt.Color(0, 102, 102));
-        titleJLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("Temp")));
+        titleJLabel.setIcon(new javax.swing.ImageIcon("src/Image/aboutPicture.jpg"));
         titleJLabel.setText("Tennis Player Quiz About");
 
         closeJButton.setBackground(new java.awt.Color(204, 255, 204));

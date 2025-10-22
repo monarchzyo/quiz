@@ -137,20 +137,7 @@ public class TennisPlayerDetails extends java.awt.Dialog {
     }//GEN-LAST:event_closeDialog
 
     public static void main(String args[]) {
-    java.awt.EventQueue.invokeLater(new Runnable() {
-        public void run() {
-            // Create test player
-            TennisPlayer testPlayer = new TennisPlayer("Belinda Bencic", 26, "Switzerland", "belinda@swiss.com", "151-151-1515", "15");
-            
-            TennisPlayerDetails dialog = new TennisPlayerDetails(new java.awt.Frame(), testPlayer);
-            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    System.exit(0);
-                }
-            });
-            dialog.setVisible(true);
-        }
-    });
+    System.out.println("Run TennisPlayersGUI instead!");
 }
 
 
@@ -162,4 +149,4 @@ public class TennisPlayerDetails extends java.awt.Dialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel playerNameLabel;
     // End of variables declaration//GEN-END:variables
-}
+    }

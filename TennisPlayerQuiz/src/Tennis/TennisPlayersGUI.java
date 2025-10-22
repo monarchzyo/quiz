@@ -1,5 +1,6 @@
 package Tennis;
 
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 
 public class TennisPlayersGUI extends javax.swing.JFrame {
     
@@ -28,37 +30,45 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
     public TennisPlayersGUI() 
     {
         initComponents();
-        readTennisPlayers("Temp.txt");
-        readStudents("Temp2.txt");
+        questionsTextField.addActionListener(this::questionsTextFieldActionPerformed);
+        submitButton.addActionListener(this::submitButtonActionPerformed);
+        nextButton.addActionListener(this::nextButtonActionPerformed);
+        playAgainButton.addActionListener(this::playAgainButtonActionPerformed);
+        studentsJList.addListSelectionListener(this::studentsJListValueChanged);
+        aboutMenuItem.addActionListener(e -> showAboutDialog());
+        readTennisPlayers("src/Data/Temp.txt");
+        readStudents("src/Data/Temp2.txt");
         startQuiz();
+        setDefaultPicture();
+        
+    
     }
     private void readTennisPlayers(String filename) {
-        try {
-            // Read file and populate both LinkedList and TreeMap
-            BufferedReader reader = new BufferedReader(new FileReader(filename));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 2) {
-                    String name = parts[0].trim();
-                    String country = parts[1].trim();
-                    
-                    // Add to LinkedList
-                    TennisPlayer player = new TennisPlayer(name, 0, country, "", "", "");
-                    tennisPlayerList.add(player);
-                    
-                    // Add to TreeMap (name -> country)
-                    tennisPlayersTreeMap.put(name, country);
-                    
-                    // Initialize used flags
-                    tennisPlayersUsedArrayList.add(false);
-                }
+    try {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length >= 6) {
+                String name = parts[0].trim();
+                String country = parts[1].trim();
+                int age = Integer.parseInt(parts[2].trim());
+                String email = parts[3].trim();
+                String phone = parts[4].trim();
+                String rank = parts[5].trim();
+                
+                // Create TennisPlayer with all parameters
+                TennisPlayer player = new TennisPlayer(name, age, country, email, phone, rank);
+                tennisPlayerList.add(player);
+                tennisPlayersTreeMap.put(name, country);
+                tennisPlayersUsedArrayList.add(false);
             }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        reader.close();
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
     private int getUniqueRandomNumber() {
         int randomIndex;
         do {
@@ -107,7 +117,25 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
             javax.swing.JOptionPane.ERROR_MESSAGE);
     }
 }
-    
+    private void questionsTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
+    try {
+        totalQuestions = Integer.parseInt(questionsTextField.getText().trim());
+        if (totalQuestions > 0 && totalQuestions <= tennisPlayerList.size()) {
+            questionsTextField.setEnabled(false);
+            displayRandomPlayer(); // This will now show the image!
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Number of questions must be between 1 and " + tennisPlayerList.size(),
+                "Invalid Input",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Please enter a valid number",
+            "Invalid Input",
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+    }
     private void startQuiz() {
     // Initialize quiz state
     currentQuestion = 0;
@@ -186,26 +214,6 @@ private void saveStudentsHelper(BinarySearchTreeNode node, java.io.PrintWriter w
     }
 }
 
-// Add action listeners for the buttons (you can set these in NetBeans designer)
-private void questionsTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
-    try {
-        totalQuestions = Integer.parseInt(questionsTextField.getText().trim());
-        if (totalQuestions > 0 && totalQuestions <= tennisPlayerList.size()) {
-            questionsTextField.setEnabled(false);
-            displayRandomPlayer();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Number of questions must be between 1 and " + tennisPlayerList.size(),
-                "Invalid Input",
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "Please enter a valid number",
-            "Invalid Input",
-            javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
-}
 
 private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {
     currentQuestion++;
@@ -230,11 +238,59 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // Display player image and name
         playerJLabel.setText(randomPlayer.getName());
         // Load and display player image...
-        
+        loadPlayerImage(randomPlayer.getName());
         // Enable submit button
         submitButton.setEnabled(true);
         nextButton.setEnabled(false);
+        resultJLabel.setText("");
+        
     }
+    
+    private void loadPlayerImage(String playerName) {
+    try {
+        // Remove spaces and special characters from filename
+        String imageName = playerName.replaceAll("[^a-zA-Z0-9]", "");
+        String imagePath = "src/Image/" + imageName + ".jpg";
+        
+        java.io.File imageFile = new java.io.File(imagePath);
+        if (imageFile.exists()) {
+            ImageIcon imageIcon = new ImageIcon(imagePath);
+            
+            // Scale image to fit the label if needed
+            Image image = imageIcon.getImage();
+            Image scaledImage = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            imageIcon = new ImageIcon(scaledImage);
+            
+            MainMenuPicture.setIcon(imageIcon);
+            MainMenuPicture.setText("");
+        } else 
+        {
+            setDefaultPicture();
+        }
+    } catch (Exception e) {
+       setDefaultPicture();
+    }
+}
+    private void setDefaultPicture()
+    {
+         try {
+        String defaultImagePath = "src/Image/default.jpeg"; // or whatever your default image is
+        java.io.File imageFile = new java.io.File(defaultImagePath);
+        if (imageFile.exists()) {
+            ImageIcon defaultIcon = new ImageIcon(defaultImagePath);
+            Image image = defaultIcon.getImage();
+            Image scaledImage = image.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+            defaultIcon = new ImageIcon(scaledImage);
+            
+            MainMenuPicture.setIcon(defaultIcon);
+            MainMenuPicture.setText(""); // Remove text
+        }
+    } catch (Exception e) {
+        // If default image fails, just remove the text
+        MainMenuPicture.setText("");
+    }
+    }
+    
     private void submitButtonActionPerformed(java.awt.event.ActionEvent evt) {
         String selectedCountry = (String) countriesComboBox.getSelectedItem();
         String correctCountry = tennisPlayersTreeMap.get(currentTennisPlayerName);
@@ -243,7 +299,7 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
             correctAnswers++;
             resultJLabel.setText("Correct! " + correctAnswers + "/" + (currentQuestion + 1));
         } else {
-            resultJLabel.setText("Incorrect! Correct answer: " + correctCountry);
+            resultJLabel.setText("<html>Incorrect!<br>Correct answer: " + correctCountry + "</html>");
         }
         
         submitButton.setEnabled(false);
@@ -261,11 +317,12 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         }
     }
     }
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
+  
+    private void showAboutDialog()
+    {
+        About aboutDialog = new About(this, true);
+              aboutDialog.setVisible(true);
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -287,8 +344,11 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         fileMenu = new javax.swing.JMenu();
         studentDatabaseMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
+        aboutMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         studentList.setToolTipText("");
 
@@ -299,21 +359,42 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         });
         studentList.setViewportView(studentsJList);
 
-        TitleLabel.setText("Tennis Player Quiz");
+        getContentPane().add(studentList, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 290, 127, 100));
 
-        MainMenuPicture.setText("PICTURE");
+        TitleLabel.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
+        TitleLabel.setForeground(new java.awt.Color(102, 255, 51));
+        TitleLabel.setText("Tennis Player Quiz");
+        getContentPane().add(TitleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(15, 17, 170, 61));
+
+        MainMenuPicture.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        MainMenuPicture.setMaximumSize(new java.awt.Dimension(200, 200));
+        MainMenuPicture.setMinimumSize(new java.awt.Dimension(200, 200));
+        MainMenuPicture.setPreferredSize(new java.awt.Dimension(200, 200));
+        getContentPane().add(MainMenuPicture, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, -1, -1));
+
+        questionsTextField.setPreferredSize(new java.awt.Dimension(80, 25));
+        getContentPane().add(questionsTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 38, -1, -1));
 
         questionsLabel.setText("Questions:");
+        getContentPane().add(questionsLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(226, 41, 62, -1));
 
         countriesComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        getContentPane().add(countriesComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 220, 127, -1));
 
         submitButton.setText("Submit");
+        getContentPane().add(submitButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 408, -1, -1));
 
         nextButton.setText("Next");
+        getContentPane().add(nextButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(84, 408, -1, -1));
 
         playAgainButton.setText("Play Again");
+        getContentPane().add(playAgainButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(162, 408, -1, -1));
 
+        selectCountryLabel.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
         selectCountryLabel.setText("Select Country:");
+        getContentPane().add(selectCountryLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 200, -1, 14));
+        getContentPane().add(playerJLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(241, 104, -1, -1));
+        getContentPane().add(resultJLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(241, 148, -1, -1));
 
         fileMenu.setText("File");
         topMenuBar.add(fileMenu);
@@ -322,78 +403,13 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         topMenuBar.add(studentDatabaseMenu);
 
         helpMenu.setText("Help");
+
+        aboutMenuItem.setText("About");
+        helpMenu.add(aboutMenuItem);
+
         topMenuBar.add(helpMenu);
 
         setJMenuBar(topMenuBar);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(submitButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(nextButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(playAgainButton)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(MainMenuPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(selectCountryLabel)
-                                .addGap(50, 50, 50))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(TitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(41, 41, 41)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(questionsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(questionsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 36, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(playerJLabel)
-                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                .addComponent(studentList)
-                                                .addComponent(countriesComboBox, 0, 127, Short.MAX_VALUE))
-                                            .addComponent(resultJLabel))
-                                        .addGap(32, 32, 32))))))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(questionsLabel)
-                    .addComponent(questionsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(playerJLabel)
-                .addGap(30, 30, 30)
-                .addComponent(resultJLabel)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(selectCountryLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(MainMenuPicture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(4, 4, 4)
-                .addComponent(countriesComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(studentList, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(submitButton)
-                    .addComponent(nextButton)
-                    .addComponent(playAgainButton))
-                .addGap(18, 18, 18))
-        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -402,11 +418,7 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        Splash splash = new Splash(3000);
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -417,15 +429,13 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new TennisPlayersGUI().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel MainMenuPicture;
     private javax.swing.JLabel TitleLabel;
+    private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JComboBox<String> countriesComboBox;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
