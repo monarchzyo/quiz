@@ -8,11 +8,55 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="printFormMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Print Form"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="printStudentMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Print Student Details"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="studentDatabaseMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Student Database"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="addStudentMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Add"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="editStudentMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Edit"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="deleteStudentMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delete"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="searchStudentMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Search"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="studentDetailsMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Student Details"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="tennisPlayersDetailsMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Tennis Player Details"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="helpMenu">
           <Properties>

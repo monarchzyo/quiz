@@ -4,6 +4,25 @@ public class BinarySearchTree
 {
     private BinarySearchTreeNode root;
     StringBuilder buffer = new StringBuilder("");
+    public Student findStudentByName(String name) {
+    return findStudentByName(root, name);
+    }
+
+    private Student findStudentByName(BinarySearchTreeNode node, String name) {
+    if (node == null) {
+        return null;
+    }
+    
+    int comparison = name.compareToIgnoreCase(node.getData().getName());
+    
+    if (comparison == 0) {
+        return node.getData(); // Found the student
+    } else if (comparison < 0) {
+        return findStudentByName(node.getLeft(), name);
+    } else {
+        return findStudentByName(node.getRight(), name);
+    }
+}
     public BinarySearchTree()
             {
                 root = null;
@@ -22,8 +41,14 @@ public class BinarySearchTree
             return true;
         }
     }
-    public synchronized void remove(Student student) {
+    public synchronized boolean remove(Student student) 
+    {
+        if (student == null || !contains(student))
+        {
+            return false;
+        }
         root = remove(student, root);
+        return true;
     }
     
     private BinarySearchTreeNode remove(Student student, BinarySearchTreeNode node) {
@@ -143,6 +168,36 @@ public class BinarySearchTree
         System.out.print(node.data + " ");
     }
 
+    public java.util.List<Student> inOrderTraversal() {
+    java.util.List<Student> result = new java.util.ArrayList<>();
+    inOrderTraversal(root, result);
+    return result;
+    }
+
+    private void inOrderTraversal(BinarySearchTreeNode node, java.util.List<Student> result) 
+    {
+        if (node != null) {
+            inOrderTraversal(node.left, result);
+            result.add(node.data);
+            inOrderTraversal(node.right, result);
+        }
+    }
+    public java.util.List<String> getAllStudentNames() 
+    {
+    java.util.List<String> names = new java.util.ArrayList<>();
+    getAllStudentNames(root, names);
+    return names;
+    }
+
+    private void getAllStudentNames(BinarySearchTreeNode node, java.util.List<String> names) 
+    {
+        if (node != null) {
+            getAllStudentNames(node.left, names);
+            names.add(node.data.getName());
+            getAllStudentNames(node.right, names);
+        }
+    }
+    
     @Override
     public String toString() {
         return "BinarySearchTree{" + "root=" + root + '}';

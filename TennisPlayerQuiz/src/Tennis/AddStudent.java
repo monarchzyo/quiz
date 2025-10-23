@@ -41,6 +41,7 @@ public class AddStudent extends java.awt.Dialog {
                 closeDialog(evt);
             }
         });
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         nameLabel.setText("Name:");
         jLayeredPane1.add(nameLabel);
@@ -97,7 +98,7 @@ public class AddStudent extends java.awt.Dialog {
                 jLayeredPane1.add(saveButton);
                 saveButton.setBounds(230, 260, 72, 23);
 
-                add(jLayeredPane1, java.awt.BorderLayout.CENTER);
+                add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 300));
 
                 pack();
             }// </editor-fold>//GEN-END:initComponents

@@ -12,6 +12,13 @@ public class EditStudent extends java.awt.Dialog {
         this.studentToEdit = studentToEdit;
         populateStudentData();
         setLocationRelativeTo(parent);
+        
+        nameField.setToolTipText("Edit student name (letters and spaces only)");
+        ageField.setToolTipText("Edit age (1-150)");
+        correctField.setToolTipText("Edit number of correct answers (0-total questions)");
+        totalField.setToolTipText("Edit total questions attempted");
+        
+        
     }
     private void populateStudentData() {
         if (studentToEdit != null) {
@@ -46,12 +53,13 @@ public class EditStudent extends java.awt.Dialog {
 
         setModal(true);
         setResizable(false);
-        setTitle("Add New Student");
+        setTitle("Edit Student");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
             }
         });
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         nameLabel.setText("Name:");
         jLayeredPane1.add(nameLabel);
@@ -108,7 +116,7 @@ public class EditStudent extends java.awt.Dialog {
                 jLayeredPane1.add(saveButton);
                 saveButton.setBounds(230, 260, 72, 23);
 
-                add(jLayeredPane1, java.awt.BorderLayout.CENTER);
+                add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 300));
 
                 pack();
             }// </editor-fold>//GEN-END:initComponents
@@ -243,7 +251,7 @@ public class EditStudent extends java.awt.Dialog {
     }//GEN-LAST:event_closeDialog
     public boolean isStudentEdited()
     {
-        return studentAdded;
+        return studentEdited;
     }
     /**
      * @param args the command line arguments

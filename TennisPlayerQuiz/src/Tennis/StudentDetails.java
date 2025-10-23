@@ -54,6 +54,7 @@ public class StudentDetails extends java.awt.Dialog {
                 closeDialog(evt);
             }
         });
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLayeredPane1.setPreferredSize(new java.awt.Dimension(400, 300));
 
@@ -80,7 +81,7 @@ public class StudentDetails extends java.awt.Dialog {
         jLayeredPane1.add(jScrollPane1);
         jScrollPane1.setBounds(30, 100, 344, 134);
 
-        add(jLayeredPane1, java.awt.BorderLayout.CENTER);
+        add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

@@ -36,6 +36,22 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
         playAgainButton.addActionListener(this::playAgainButtonActionPerformed);
         studentsJList.addListSelectionListener(this::studentsJListValueChanged);
         aboutMenuItem.addActionListener(e -> showAboutDialog());
+        addStudentMenu.addActionListener(e -> addStudent());
+        editStudentMenu.addActionListener(e -> editStudent());
+        deleteStudentMenu.addActionListener(e -> deleteStudent());
+        searchStudentMenu.addActionListener(e -> searchStudent());
+        studentDetailsMenu.addActionListener(e -> showStudentDetails());
+        questionsTextField.setToolTipText("Enter number of questions (1-" + tennisPlayerList.size() + ")");
+        submitButton.setToolTipText("Submit your country selection");
+        nextButton.setToolTipText("Move to next question");
+        playAgainButton.setToolTipText("Start a new quiz");
+        countriesComboBox.setToolTipText("Select the country for the displayed tennis player");
+        studentsJList.setToolTipText("Select a student to take the quiz");
+        printFormMenuItem.setToolTipText("Print the main quiz form as GUI");
+        printStudentMenuItem.setToolTipText("Print detailed report of selected student");
+        aboutMenuItem.setToolTipText("View information about this application");
+        studentDetailsMenu.setToolTipText("View detailed information about selected student");
+        printMenuItems();
         readTennisPlayers("src/Data/Temp.txt");
         readStudents("src/Data/Temp2.txt");
         startQuiz();
@@ -117,24 +133,22 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
             javax.swing.JOptionPane.ERROR_MESSAGE);
     }
 }
-    private void questionsTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
-    try {
-        totalQuestions = Integer.parseInt(questionsTextField.getText().trim());
-        if (totalQuestions > 0 && totalQuestions <= tennisPlayerList.size()) {
+    private void questionsTextFieldActionPerformed(java.awt.event.ActionEvent evt) 
+    {
+            String input = questionsTextField.getText().trim();
+            if (!Validation.isInteger(input, 1, tennisPlayerList.size())) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Number of questions must be between 1 and " + tennisPlayerList.size(),
+                    "Invalid Input",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+                questionsTextField.setText("");
+                questionsTextField.requestFocus();
+                return;
+            }
+
+            totalQuestions = Integer.parseInt(input);
             questionsTextField.setEnabled(false);
-            displayRandomPlayer(); // This will now show the image!
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Number of questions must be between 1 and " + tennisPlayerList.size(),
-                "Invalid Input",
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "Please enter a valid number",
-            "Invalid Input",
-            javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
+            displayRandomPlayer();
     }
     private void startQuiz() {
     // Initialize quiz state
@@ -194,7 +208,7 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
 }
     private void saveStudents(String filename) {
     try {
-        java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter(filename));
+        java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter("src/Data/" + filename));
         saveStudentsHelper(studentsTree.getRoot(), writer);
         writer.close();
     } catch (IOException e) {
@@ -202,49 +216,193 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
     }
 }
 
-private void saveStudentsHelper(BinarySearchTreeNode node, java.io.PrintWriter writer) {
-    if (node != null) {
-        saveStudentsHelper(node.getLeft(), writer);
-        Student student = node.getData();
-        writer.println(student.getName() + "," + 
-                      student.getAge() + "," + 
-                      student.getCorrect() + "," + 
-                      student.getTotalQuestions());
-        saveStudentsHelper(node.getRight(), writer);
+        private void deleteStudent() {
+        System.out.println("=== DEBUG: deleteStudent() STARTED ===");
+    
+    if (selectedStudent == null) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Please select a student from the list first.",
+            "No Student Selected",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
     }
+
+    // Confirm deletion
+    int confirmation = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to delete student:\n" +
+        "Name: " + selectedStudent.getName() + "\n" +
+        "Age: " + selectedStudent.getAge() + "\n" +
+        "This action cannot be undone!",
+        "Confirm Deletion",
+        javax.swing.JOptionPane.YES_NO_OPTION,
+        javax.swing.JOptionPane.WARNING_MESSAGE);
+
+    if (confirmation == javax.swing.JOptionPane.YES_OPTION) {
+        try {
+            System.out.println("DEBUG: Deleting student: " + selectedStudent.getName());
+            
+            // Remove from BST
+            boolean removed = studentsTree.remove(selectedStudent);
+            System.out.println("DEBUG: Student removed from BST: " + removed);
+            
+            if (removed) {
+                // Save to file
+                saveStudents("Temp2.txt");
+                System.out.println("DEBUG: File saved after deletion");
+                
+                // Refresh the list
+                refreshStudentsList();
+                System.out.println("DEBUG: List refreshed after deletion");
+                
+                // Clear selection
+                selectedStudent = null;
+                studentsJList.clearSelection();
+                
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Student deleted successfully!",
+                    "Deletion Successful",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error: Could not delete student from database.",
+                    "Deletion Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            System.out.println("DEBUG: Error during deletion: " + e.getMessage());
+            e.printStackTrace();
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Error deleting student: " + e.getMessage(),
+                "Deletion Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    } else {
+        System.out.println("DEBUG: Deletion cancelled by user");
+    }
+    System.out.println("=== DEBUG: deleteStudent() COMPLETED ===");
 }
+        
+        
+        private void searchStudent() {
+    System.out.println("=== DEBUG: searchStudent() STARTED ===");
+    
+    // Show input dialog for search
+    String searchName = javax.swing.JOptionPane.showInputDialog(this,
+        "Enter student name to search:",
+        "Search Student",
+        javax.swing.JOptionPane.QUESTION_MESSAGE);
 
+    // If user clicked Cancel or entered nothing
+    if (searchName == null || searchName.trim().isEmpty()) {
+        System.out.println("DEBUG: Search cancelled or empty input");
+        return;
+    }
 
-private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {
-    currentQuestion++;
-    displayRandomPlayer();
-}
-
-private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
-    startQuiz();
+    searchName = searchName.trim();
+    System.out.println("DEBUG: Searching for student: '" + searchName + "'");
+    
+    try {
+        // Search in BST
+        Student foundStudent = studentsTree.findStudentByName(searchName);
+        
+        if (foundStudent != null) {
+            System.out.println("DEBUG: Student found: " + foundStudent.getName());
+            
+            // Select the student in the JList
+            selectStudentInList(foundStudent.getName());
+            
+            // Show detailed information
+            String message = "STUDENT FOUND!\n\n" +
+                           "Name: " + foundStudent.getName() + "\n" +
+                           "Age: " + foundStudent.getAge() + "\n" +
+                           "Correct Answers: " + foundStudent.getCorrect() + "\n" +
+                           "Total Questions: " + foundStudent.getTotalQuestions() + "\n" +
+                           "Success Rate: " + String.format("%.1f", foundStudent.calculatePercent()) + "%\n\n" +
+                           "Performance: " + getPerformanceRating(foundStudent.calculatePercent());
+            
+            javax.swing.JOptionPane.showMessageDialog(this,
+                message,
+                "Student Found - " + foundStudent.getName(),
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            System.out.println("DEBUG: Student not found: '" + searchName + "'");
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Student '" + searchName + "' was not found in the database.\n" +
+                "Please check the spelling and try again.",
+                "Student Not Found",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+    } catch (Exception e) {
+        System.out.println("DEBUG: Error during search: " + e.getMessage());
+        e.printStackTrace();
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Error searching for student: " + e.getMessage(),
+            "Search Error",
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+    System.out.println("=== DEBUG: searchStudent() COMPLETED ===");
 }
     
-    private void displayRandomPlayer() {
-        if (currentQuestion >= totalQuestions) {
-            // Quiz finished
-            endQuiz();
-            return;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    private void saveStudentsHelper(BinarySearchTreeNode node, java.io.PrintWriter writer) {
+        if (node != null) {
+            saveStudentsHelper(node.getLeft(), writer);
+            Student student = node.getData();
+            writer.println(student.getName() + "," + 
+                          student.getAge() + "," + 
+                          student.getCorrect() + "," + 
+                          student.getTotalQuestions());
+            saveStudentsHelper(node.getRight(), writer);
         }
-        
-        int randomIndex = getUniqueRandomNumber();
-        TennisPlayer randomPlayer = tennisPlayerList.get(randomIndex);
-        currentTennisPlayerName = randomPlayer.getName();
-        
-        // Display player image and name
-        playerJLabel.setText(randomPlayer.getName());
-        // Load and display player image...
-        loadPlayerImage(randomPlayer.getName());
-        // Enable submit button
-        submitButton.setEnabled(true);
-        nextButton.setEnabled(false);
-        resultJLabel.setText("");
-        
     }
+
+
+    private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        currentQuestion++;
+        displayRandomPlayer();
+    }
+
+    private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        startQuiz();
+    }
+
+        private void displayRandomPlayer() {
+            if (currentQuestion >= totalQuestions) {
+                // Quiz finished
+                endQuiz();
+                return;
+            }
+
+            int randomIndex = getUniqueRandomNumber();
+            TennisPlayer randomPlayer = tennisPlayerList.get(randomIndex);
+            currentTennisPlayerName = randomPlayer.getName();
+
+            // Display player image and name
+            playerJLabel.setText(randomPlayer.getName());
+            // Load and display player image...
+            loadPlayerImage(randomPlayer.getName());
+            // Enable submit button
+            submitButton.setEnabled(true);
+            nextButton.setEnabled(false);
+            resultJLabel.setText("");
+
+        }
     
     private void loadPlayerImage(String playerName) {
     try {
@@ -309,15 +467,193 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
     if (!evt.getValueIsAdjusting()) {
         String selectedName = studentsJList.getSelectedValue();
         if (selectedName != null) {
-            // Find the student in BST
-            BinarySearchTreeNode node = studentsTree.nodeWith(selectedName, studentsTree.getRoot());
-            if (node != null) {
-                selectedStudent = node.getData();
-            }
+          selectedStudent = studentsTree.findStudentByName(selectedName);
+            
         }
     }
     }
-  
+    
+    private void printMenuItems()
+    {
+        printFormMenuItem.addActionListener(e -> printFormAsGUI());
+        printFormMenuItem.setToolTipText("Print the main quiz form as GUI");
+        printStudentMenuItem.addActionListener(e -> printStudentDetails());
+        printStudentMenuItem.setToolTipText("Print detailed report of selected student");
+    }
+        private void printFormAsGUI() {
+    try {
+        PrintUtilities.printComponent(this); // 'this' refers to the main JFrame
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Form printed successfully!", "Print Success", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error printing form: " + e.getMessage(), "Print Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+        private void printStudentDetails() {
+            if (selectedStudent == null) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Please select a student first.", "No Student Selected", 
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                String studentDetails = formatStudentDetails(selectedStudent);
+                PrintUtilities.printStudentDetails(studentDetails);
+
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Student details printed successfully!", "Print Success", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Error printing student details: " + e.getMessage(), "Print Error", 
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    private String formatStudentDetails(Student student) 
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("STUDENT QUIZ PERFORMANCE REPORT\n");
+        sb.append("===============================\n\n");
+        sb.append("Personal Information:\n");
+        sb.append("  Name: ").append(student.getName()).append("\n");
+        sb.append("  Age: ").append(student.getAge()).append("\n\n");
+
+        sb.append("Quiz Statistics:\n");
+        sb.append("  Correct Answers: ").append(student.getCorrect()).append("\n");
+        sb.append("  Total Questions: ").append(student.getTotalQuestions()).append("\n");
+        sb.append("  Success Rate: ").append(String.format("%.1f", student.calculatePercent())).append("%\n\n");
+
+        sb.append("Performance Analysis:\n");
+        double percent = student.calculatePercent();
+        if (percent >= 80) {
+            sb.append("  Excellent! Keep up the great work!\n");
+        } else if (percent >= 60) {
+            sb.append("  Good performance! Room for improvement.\n");
+        } else {
+            sb.append("  Needs improvement. Practice more!\n");
+        }
+
+        sb.append("\n===============================\n");
+        sb.append("Tennis Players Quiz System\n");
+        sb.append("Report generated: ").append(new java.util.Date());
+
+        return sb.toString();
+    }
+    
+        private void addStudent() 
+        {
+        AddStudent dialog = new AddStudent(this, true, studentsTree);
+        dialog.setVisible(true);
+
+        if (dialog.isStudentAdded()) {
+            // Student was added successfully
+            saveStudents("Students.txt"); // Or whatever your filename is
+            refreshStudentsList();
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Student added successfully to the database!",
+                "Success",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+        }
+    
+         private void refreshStudentsList() 
+            {
+                DefaultListModel<String> model = new DefaultListModel<>();
+                java.util.List<String> studentNames = studentsTree.getAllStudentNames();
+                for (String name : studentNames) {
+                    model.addElement(name);
+                }
+                studentsJList.setModel(model);
+            }
+        
+         
+         
+         
+    private void editStudent() {
+    if (selectedStudent == null) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Please select a student from the list first.",
+            "No Student Selected",
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    // Store original name for selection after refresh
+    String originalName = selectedStudent.getName();
+    
+    EditStudent dialog = new EditStudent(this, true, studentsTree, selectedStudent);
+    dialog.setVisible(true);
+    
+    if (dialog.isStudentEdited()) {
+        System.out.println("DEBUG: Student edited, saving file...");
+        saveStudents("Temp2.txt");
+        refreshStudentsList();
+        try {
+            Student updatedStudent = studentsTree.findStudentByName(originalName);
+            if (updatedStudent == null) 
+            {
+                selectedStudent = null;
+                studentsJList.clearSelection();
+            } else {
+                selectedStudent = updatedStudent;
+            }
+            } catch (Exception e) {
+                System.out.println("DEBUG: Error selecting student: " + e.getMessage());
+            }
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Student information updated successfully!",
+                "Success",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                System.out.println("DEBUG: Student edit was cancelled");
+            }
+        }
+        
+        private void showStudentDetails() {
+        System.out.println("=== DEBUG: showStudentDetails() STARTED ===");
+
+        if (selectedStudent == null) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Please select a student from the list first.",
+                "No Student Selected",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            System.out.println("DEBUG: No student selected");
+            return;
+        }
+
+        System.out.println("DEBUG: Showing details for: " + selectedStudent.getName());
+
+        try {
+            // Use your StudentDetails dialog class
+            StudentDetails dialog = new StudentDetails(this, true, selectedStudent);
+            dialog.setVisible(true);
+            System.out.println("DEBUG: StudentDetails dialog closed");
+        } catch (Exception e) {
+            System.out.println("DEBUG: Error showing student details: " + e.getMessage());
+            e.printStackTrace();
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Error displaying student details: " + e.getMessage(),
+                "Display Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+
+        System.out.println("=== DEBUG: showStudentDetails() COMPLETED ===");
+        }
+    
+    
+    
+    
+    
+    
+    
     private void showAboutDialog()
     {
         About aboutDialog = new About(this, true);
@@ -342,7 +678,15 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         resultJLabel = new javax.swing.JLabel();
         topMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
+        printFormMenuItem = new javax.swing.JMenuItem();
+        printStudentMenuItem = new javax.swing.JMenuItem();
         studentDatabaseMenu = new javax.swing.JMenu();
+        addStudentMenu = new javax.swing.JMenuItem();
+        editStudentMenu = new javax.swing.JMenuItem();
+        deleteStudentMenu = new javax.swing.JMenuItem();
+        searchStudentMenu = new javax.swing.JMenuItem();
+        studentDetailsMenu = new javax.swing.JMenuItem();
+        tennisPlayersDetailsMenu = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         aboutMenuItem = new javax.swing.JMenuItem();
 
@@ -397,9 +741,35 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
         getContentPane().add(resultJLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(241, 148, -1, -1));
 
         fileMenu.setText("File");
+
+        printFormMenuItem.setText("Print Form");
+        fileMenu.add(printFormMenuItem);
+
+        printStudentMenuItem.setText("Print Student Details");
+        fileMenu.add(printStudentMenuItem);
+
         topMenuBar.add(fileMenu);
 
         studentDatabaseMenu.setText("Student Database");
+
+        addStudentMenu.setText("Add");
+        studentDatabaseMenu.add(addStudentMenu);
+
+        editStudentMenu.setText("Edit");
+        studentDatabaseMenu.add(editStudentMenu);
+
+        deleteStudentMenu.setText("Delete");
+        studentDatabaseMenu.add(deleteStudentMenu);
+
+        searchStudentMenu.setText("Search");
+        studentDatabaseMenu.add(searchStudentMenu);
+
+        studentDetailsMenu.setText("Student Details");
+        studentDatabaseMenu.add(studentDetailsMenu);
+
+        tennisPlayersDetailsMenu.setText("Tennis Player Details");
+        studentDatabaseMenu.add(tennisPlayersDetailsMenu);
+
         topMenuBar.add(studentDatabaseMenu);
 
         helpMenu.setText("Help");
@@ -436,20 +806,28 @@ private void playAgainButtonActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JLabel MainMenuPicture;
     private javax.swing.JLabel TitleLabel;
     private javax.swing.JMenuItem aboutMenuItem;
+    private javax.swing.JMenuItem addStudentMenu;
     private javax.swing.JComboBox<String> countriesComboBox;
+    private javax.swing.JMenuItem deleteStudentMenu;
+    private javax.swing.JMenuItem editStudentMenu;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton playAgainButton;
     private javax.swing.JLabel playerJLabel;
+    private javax.swing.JMenuItem printFormMenuItem;
+    private javax.swing.JMenuItem printStudentMenuItem;
     private javax.swing.JLabel questionsLabel;
     private javax.swing.JTextField questionsTextField;
     private javax.swing.JLabel resultJLabel;
+    private javax.swing.JMenuItem searchStudentMenu;
     private javax.swing.JLabel selectCountryLabel;
     private javax.swing.JMenu studentDatabaseMenu;
+    private javax.swing.JMenuItem studentDetailsMenu;
     private javax.swing.JScrollPane studentList;
     private javax.swing.JList<String> studentsJList;
     private javax.swing.JButton submitButton;
+    private javax.swing.JMenuItem tennisPlayersDetailsMenu;
     private javax.swing.JMenuBar topMenuBar;
     // End of variables declaration//GEN-END:variables
 }

@@ -5,9 +5,9 @@ public class About extends javax.swing.JDialog
     {
         super(parent, modal);
         initComponents();
-
+        
         this.getRootPane().setDefaultButton(closeJButton); 
-        this.setLocationRelativeTo(null);       //center form
+        this.setLocationRelativeTo(null); 
         infoJTextArea.setCaretPosition(0);
     }
 
@@ -30,7 +30,7 @@ public class About extends javax.swing.JDialog
 
         titleJLabel.setFont(new java.awt.Font("Tempus Sans ITC", 2, 36)); // NOI18N
         titleJLabel.setForeground(new java.awt.Color(0, 102, 102));
-        titleJLabel.setIcon(new javax.swing.ImageIcon("src/Image/aboutPicture.jpg"));
+        titleJLabel.setIcon(new javax.swing.ImageIcon("src/Image/aboutPicture.png"));
         titleJLabel.setText("Tennis Player Quiz About");
 
         closeJButton.setBackground(new java.awt.Color(204, 255, 204));
