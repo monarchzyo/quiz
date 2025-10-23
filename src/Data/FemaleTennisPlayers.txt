@@ -1,0 +1,20 @@
+Iga Swiatek,Poland,23,swiatek@poland.com,111-222-3333,1
+Aryna Sabalenka,Belarus,26,sabalenka@belarus.com,222-333-4444,2
+Coco Gauff,USA,20,gauff@usa.com,333-444-5555,3
+Elena Rybakina,Kazakhstan,25,rybakina@kazakhstan.com,444-555-6666,4
+Jessica Pegula,USA,30,pegula@usa.com,555-666-7777,5
+Ons Jabeur,Tunisia,30,jabeur@tunisia.com,666-777-8888,6
+Marketa Vondrousova,Czech Republic,25,vondrousova@czech.com,777-888-9999,7
+Qinwen Zheng,China,21,zheng@china.com,888-999-0000,8
+Maria Sakkari,Greece,29,sakkari@greece.com,999-000-1111,9
+Karolina Muchova,Czech Republic,28,muchova@czech.com,000-111-2222,10
+Daria Kasatkina,Russia,27,kasatkina@russia.com,111-222-3333,11
+Jelena Ostapenko,Latvia,27,ostapenko@latvia.com,222-333-4444,12
+Beatriz Haddad Maia,Brazil,28,maia@brazil.com,333-444-5555,13
+Madison Keys,USA,29,keys@usa.com,444-555-6666,14
+Elina Svitolina,Ukraine,30,svitolina@ukraine.com,555-666-7777,15
+Liudmila Samsonova,Russia,26,samsonova@russia.com,666-777-8888,16
+Ekaterina Alexandrova,Russia,29,alexandrova@russia.com,777-888-9999,17
+Anastasia Pavlyuchenkova,Russia,33,pavlyuchenkova@russia.com,888-999-0000,18
+Veronika Kudermetova,Russia,27,kudermetova@russia.com,999-000-1111,19
+Caroline Garcia,France,31,garcia@france.com,100-200-3000,20

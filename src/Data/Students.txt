@@ -1,0 +1,20 @@
+Abdah Abdo,21,4,5
+Bao Tuan Nguyen,22,7,8
+Cornelius Darrel,20,9,10
+Darion Parrish,19,6,9
+Emma Watson,21,8,10
+Franklin Chen,23,5,7
+Gabriella Rossi,20,10,10
+Hiroshi Tanaka,22,7,9
+Isabella Garcia,19,6,8
+Jacob Williams,21,8,10
+Katherine Lee,20,5,6
+Liam O'Connor,22,9,10
+Maya Patel,19,7,9
+Nathan Kim,21,4,5
+Olivia Brown,20,8,10
+Patrick Schmidt,22,6,8
+Quinn Johnson,19,9,10
+Rachel Zhang,21,7,9
+Samuel Davis,20,5,7
+Taylor Wilson,22,8,10
