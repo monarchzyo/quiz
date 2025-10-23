@@ -1,7 +1,0 @@
-Aryna Sabalenka,Belarus,27,aryna@belaruski.com,111-111-1111,1
-Coco Gauff,USA,21,coco@usa.com,222-222-2222,2
-Elena Rybakina,Kazakhstan,26,elena@kazakhstan.com,333-333-3333,3
-Iga Swiatek,Poland,24,iga@polski.com,444-444-4444,4
-Jasmine Paolini,Italy,29,jasmine@italia.com,555-555-5555,5
-Qinwen Zheng,China,23,qinwen@china.com,666-666-6666,6
-Mirra Andreeva,Russia,mira@ruski.com,777-777-7777,7
