@@ -1,6 +1,6 @@
 package Tennis;
 
-public class StudentDetails extends java.awt.Dialog {
+public class StudentDetails extends javax.swing.JDialog {
     private Student student;
     public StudentDetails(java.awt.Frame parent, boolean modal, Student student) 
     {
@@ -46,7 +46,7 @@ public class StudentDetails extends java.awt.Dialog {
         detailsTextArea = new javax.swing.JTextArea();
 
         setModal(true);
-        setPreferredSize(new java.awt.Dimension(400, 100));
+        setPreferredSize(new java.awt.Dimension(400, 350));
         setResizable(false);
         setTitle("Student Details");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -57,31 +57,36 @@ public class StudentDetails extends java.awt.Dialog {
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLayeredPane1.setPreferredSize(new java.awt.Dimension(400, 300));
+        jLayeredPane1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         closeButton.setText("Close");
-        jLayeredPane1.add(closeButton);
-        closeButton.setBounds(170, 260, 72, 23);
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
+        jLayeredPane1.add(closeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 200, -1, -1));
 
         setTitle("Student Details");
         setResizable(false);
         titleLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titleLabel.setText("Student Details");
-        jLayeredPane1.add(titleLabel);
-        titleLabel.setBounds(160, 30, 107, 19);
+        jLayeredPane1.add(titleLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, -1, -1));
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(380, 220));
 
         detailsTextArea.setEditable(false);
         detailsTextArea.setColumns(30);
         detailsTextArea.setLineWrap(true);
-        detailsTextArea.setRows(8);
-        detailsTextArea.setText("\"\"");
+        detailsTextArea.setRows(10);
         detailsTextArea.setWrapStyleWord(true);
         detailsTextArea.setFocusable(false);
         jScrollPane1.setViewportView(detailsTextArea);
 
-        jLayeredPane1.add(jScrollPane1);
-        jScrollPane1.setBounds(30, 100, 344, 134);
+        jLayeredPane1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, 200, 100));
 
-        add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 320, 260));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -93,6 +98,10 @@ public class StudentDetails extends java.awt.Dialog {
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
+
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
+        dispose();
+    }//GEN-LAST:event_closeButtonActionPerformed
 
     /**
      * @param args the command line arguments

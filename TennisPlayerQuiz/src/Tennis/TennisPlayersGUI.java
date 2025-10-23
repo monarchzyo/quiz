@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class TennisPlayersGUI extends javax.swing.JFrame {
     
@@ -41,6 +42,10 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
         deleteStudentMenu.addActionListener(e -> deleteStudent());
         searchStudentMenu.addActionListener(e -> searchStudent());
         studentDetailsMenu.addActionListener(e -> showStudentDetails());
+        tennisPlayersDetailsMenu.addActionListener(e -> showTennisPlayerDetails());
+        newMenu.addActionListener(e -> newFile());
+        clearMenu.addActionListener(e -> clearQuiz());
+        exitMenu.addActionListener(e -> exitApplication());
         questionsTextField.setToolTipText("Enter number of questions (1-" + tennisPlayerList.size() + ")");
         submitButton.setToolTipText("Submit your country selection");
         nextButton.setToolTipText("Move to next question");
@@ -343,12 +348,175 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
     System.out.println("=== DEBUG: searchStudent() COMPLETED ===");
 }
     
+        private String getPerformanceRating(double percent) 
+        {
+        if (percent >= 80) {
+            return "Excellent! Keep up the great work!";
+        } else if (percent >= 60) {
+            return "Good performance! Room for improvement.";
+        } else {
+            return "Needs improvement. Practice more!";
+        }
+        }
     
     
+        private void showTennisPlayerDetails() {
+            System.out.println("=== DEBUG: showTennisPlayerDetails() STARTED ===");
+
+            // Get the currently displayed tennis player
+            if (currentTennisPlayerName == null) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Please start a quiz first to view tennis player details.",
+                    "No Player Displayed",
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                // Find the tennis player in the list
+                TennisPlayer currentPlayer = null;
+                for (TennisPlayer player : tennisPlayerList) {
+                    if (player.getName().equals(currentTennisPlayerName)) {
+                        currentPlayer = player;
+                        break;
+                    }
+                }
+
+                if (currentPlayer != null) {
+                    System.out.println("DEBUG: Showing details for: " + currentPlayer.getName());
+                    TennisPlayerDetails dialog = new TennisPlayerDetails(this, true, currentPlayer);
+                    dialog.setVisible(true);
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                        "Could not find details for the current tennis player.",
+                        "Player Not Found",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                System.out.println("DEBUG: Error showing tennis player details: " + e.getMessage());
+                e.printStackTrace();
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Error displaying tennis player details: " + e.getMessage(),
+                    "Display Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+        }
     
-    
-    
-    
+        private void newFile() {
+            System.out.println("=== DEBUG: newFile() STARTED ===");
+
+            // Create a JFileChooser to select new data files
+            javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+            fileChooser.setDialogTitle("Select New Tennis Players File");
+            fileChooser.setCurrentDirectory(new java.io.File("src/Data/"));
+
+            int result = fileChooser.showOpenDialog(this);
+            if (result == javax.swing.JFileChooser.APPROVE_OPTION) {
+                try {
+                    java.io.File selectedFile = fileChooser.getSelectedFile();
+                    System.out.println("DEBUG: Selected file: " + selectedFile.getPath());
+
+                    // Clear existing data
+                    tennisPlayerList.clear();
+                    tennisPlayersTreeMap.clear();
+                    tennisPlayersUsedArrayList.clear();
+
+                    // Read new tennis players file
+                    readTennisPlayers(selectedFile.getPath());
+
+                    // Reset quiz state
+                    startQuiz();
+                    populateCountriesComboBox();
+
+                    // Update tooltip with new size
+                    questionsTextField.setToolTipText("Enter number of questions (1-" + tennisPlayerList.size() + ")");
+
+                    JOptionPane.showMessageDialog(this,
+                        "New tennis players file loaded successfully!\n" +
+                        "Loaded " + tennisPlayerList.size() + " players.",
+                        "File Loaded",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                } catch (Exception e) {
+                    System.out.println("DEBUG: Error loading new file: " + e.getMessage());
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                        "Error loading file: " + e.getMessage(),
+                        "File Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            System.out.println("=== DEBUG: newFile() COMPLETED ===");
+        }
+
+            private void clearQuiz() {
+                System.out.println("=== DEBUG: clearQuiz() STARTED ===");
+
+                // Confirm clear action if quiz is in progress
+                if (currentQuestion > 0) {
+                    int confirmation = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to clear the current quiz?\n" +
+                        "Progress will be lost and no score will be recorded.",
+                        "Confirm Clear Quiz",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+
+                    if (confirmation != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                }
+
+                // Reset quiz state
+                currentQuestion = 0;
+                correctAnswers = 0;
+                totalQuestions = 0;
+                currentTennisPlayerName = null;
+
+                // Reset UI components
+                questionsTextField.setText("");
+                questionsTextField.setEnabled(true);
+                submitButton.setEnabled(false);
+                nextButton.setEnabled(false);
+                playAgainButton.setEnabled(false);
+                resultJLabel.setText("");
+                playerJLabel.setText("");
+                countriesComboBox.setSelectedIndex(0);
+
+                // Reset used players array
+                for (int i = 0; i < tennisPlayersUsedArrayList.size(); i++) {
+                    tennisPlayersUsedArrayList.set(i, false);
+                }
+
+                // Set default picture
+                setDefaultPicture();
+
+                // Enable student selection
+                studentsJList.setEnabled(true);
+
+                System.out.println("DEBUG: Quiz cleared successfully");
+                System.out.println("=== DEBUG: clearQuiz() COMPLETED ===");
+            }
+
+            private void exitApplication() {
+                System.out.println("=== DEBUG: exitApplication() STARTED ===");
+
+                int confirmation = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to exit the application?",
+                    "Confirm Exit",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+                if (confirmation == JOptionPane.YES_OPTION) {
+                    System.out.println("DEBUG: Application exiting...");
+
+                    // Save any pending data
+                    saveStudents("Temp2.txt");
+
+                    // Exit the application
+                    System.exit(0);
+                }
+                System.out.println("=== DEBUG: exitApplication() COMPLETED ===");
+            }
     
     
     
@@ -552,8 +720,8 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
         dialog.setVisible(true);
 
         if (dialog.isStudentAdded()) {
-            // Student was added successfully
-            saveStudents("Students.txt"); // Or whatever your filename is
+            
+            saveStudents("Temp2.txt");
             refreshStudentsList();
 
             javax.swing.JOptionPane.showMessageDialog(this,
@@ -617,38 +785,47 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
             }
         }
         
-        private void showStudentDetails() {
-        System.out.println("=== DEBUG: showStudentDetails() STARTED ===");
+       private void showStudentDetails() 
+       {
+            System.out.println("=== DEBUG: showStudentDetails() STARTED ===");
 
-        if (selectedStudent == null) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Please select a student from the list first.",
-                "No Student Selected",
-                javax.swing.JOptionPane.WARNING_MESSAGE);
-            System.out.println("DEBUG: No student selected");
-            return;
+            if (selectedStudent == null) {
+                JOptionPane.showMessageDialog(this,
+                    "Please select a student from the list first.",
+                    "No Student Selected",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            System.out.println("DEBUG: Showing details for: " + selectedStudent.getName());
+
+            try {
+                StudentDetails dialog = new StudentDetails(this, true, selectedStudent);
+                dialog.setVisible(true);
+                System.out.println("DEBUG: StudentDetails dialog closed successfully");
+            } catch (Exception e) {
+                System.out.println("DEBUG: Error in StudentDetails: " + e.getMessage());
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this,
+                    "Error displaying student details: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
+            
+       private void selectStudentInList(String studentName) 
+       {
+        DefaultListModel<String> model = (DefaultListModel<String>) studentsJList.getModel();
 
-        System.out.println("DEBUG: Showing details for: " + selectedStudent.getName());
-
-        try {
-            // Use your StudentDetails dialog class
-            StudentDetails dialog = new StudentDetails(this, true, selectedStudent);
-            dialog.setVisible(true);
-            System.out.println("DEBUG: StudentDetails dialog closed");
-        } catch (Exception e) {
-            System.out.println("DEBUG: Error showing student details: " + e.getMessage());
-            e.printStackTrace();
-            javax.swing.JOptionPane.showMessageDialog(this,
-                "Error displaying student details: " + e.getMessage(),
-                "Display Error",
-                javax.swing.JOptionPane.ERROR_MESSAGE);
+        // Find the student in the list and select it
+        for (int i = 0; i < model.getSize(); i++) {
+            if (model.getElementAt(i).equals(studentName)) {
+                studentsJList.setSelectedIndex(i);
+                studentsJList.ensureIndexIsVisible(i); // Scroll to make it visible
+                break;
+            }
         }
-
-        System.out.println("=== DEBUG: showStudentDetails() COMPLETED ===");
         }
-    
-    
     
     
     
@@ -678,8 +855,11 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
         resultJLabel = new javax.swing.JLabel();
         topMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
+        newMenu = new javax.swing.JMenuItem();
+        clearMenu = new javax.swing.JMenuItem();
         printFormMenuItem = new javax.swing.JMenuItem();
         printStudentMenuItem = new javax.swing.JMenuItem();
+        exitMenu = new javax.swing.JMenuItem();
         studentDatabaseMenu = new javax.swing.JMenu();
         addStudentMenu = new javax.swing.JMenuItem();
         editStudentMenu = new javax.swing.JMenuItem();
@@ -742,11 +922,20 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
 
         fileMenu.setText("File");
 
+        newMenu.setText("New");
+        fileMenu.add(newMenu);
+
+        clearMenu.setText("Clear");
+        fileMenu.add(clearMenu);
+
         printFormMenuItem.setText("Print Form");
         fileMenu.add(printFormMenuItem);
 
         printStudentMenuItem.setText("Print Student Details");
         fileMenu.add(printStudentMenuItem);
+
+        exitMenu.setText("Exit");
+        fileMenu.add(exitMenu);
 
         topMenuBar.add(fileMenu);
 
@@ -807,11 +996,14 @@ public class TennisPlayersGUI extends javax.swing.JFrame {
     private javax.swing.JLabel TitleLabel;
     private javax.swing.JMenuItem aboutMenuItem;
     private javax.swing.JMenuItem addStudentMenu;
+    private javax.swing.JMenuItem clearMenu;
     private javax.swing.JComboBox<String> countriesComboBox;
     private javax.swing.JMenuItem deleteStudentMenu;
     private javax.swing.JMenuItem editStudentMenu;
+    private javax.swing.JMenuItem exitMenu;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JMenuItem newMenu;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton playAgainButton;
     private javax.swing.JLabel playerJLabel;

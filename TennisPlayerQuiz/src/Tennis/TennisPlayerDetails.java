@@ -8,9 +8,9 @@ import javax.swing.ImageIcon;
 
 public class TennisPlayerDetails extends java.awt.Dialog {
     private TennisPlayer player;
-    public TennisPlayerDetails(java.awt.Frame parent, TennisPlayer player) 
+    public TennisPlayerDetails(java.awt.Frame parent, boolean modal, TennisPlayer player) 
     {
-    super(parent, true);
+    super(parent, modal);
     this.player = player;
     initComponents();
     loadPlayerData();
@@ -89,12 +89,14 @@ public class TennisPlayerDetails extends java.awt.Dialog {
                 closeDialog(evt);
             }
         });
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLayeredPane1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         playerNameLabel.setFont(new java.awt.Font("SansSerif", 1, 24)); // NOI18N
         playerNameLabel.setForeground(new java.awt.Color(51, 51, 255));
         playerNameLabel.setText("PLAYER NAME");
-        jLayeredPane1.add(playerNameLabel);
-        playerNameLabel.setBounds(40, 30, 300, 80);
+        jLayeredPane1.add(playerNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 300, 80));
 
         detailsTextArea.setEditable(false);
         detailsTextArea.setBackground(new java.awt.Color(255, 255, 255));
@@ -105,8 +107,7 @@ public class TennisPlayerDetails extends java.awt.Dialog {
         detailsTextArea.setWrapStyleWord(true);
         jScrollPane1.setViewportView(detailsTextArea);
 
-        jLayeredPane1.add(jScrollPane1);
-        jScrollPane1.setBounds(40, 90, 300, 160);
+        jLayeredPane1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 90, 300, 160));
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -114,16 +115,14 @@ public class TennisPlayerDetails extends java.awt.Dialog {
                 closeButtonActionPerformed(evt);
             }
         });
-        jLayeredPane1.add(closeButton);
-        closeButton.setBounds(150, 270, 72, 23);
+        jLayeredPane1.add(closeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 270, -1, -1));
 
         flagLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         flagLabel.setText("Loading flag");
         flagLabel.setBorder(javax.swing.BorderFactory.createTitledBorder("Country Flag"));
-        jLayeredPane1.add(flagLabel);
-        flagLabel.setBounds(257, 16, 80, 70);
+        jLayeredPane1.add(flagLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(257, 16, 80, 70));
 
-        add(jLayeredPane1, java.awt.BorderLayout.CENTER);
+        add(jLayeredPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, 300));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
